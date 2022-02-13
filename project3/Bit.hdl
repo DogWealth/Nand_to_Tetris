@@ -1,0 +1,40 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/Bit.hdl
+
+/**
+ * 1-bit register:
+ * If load[t] == 1 then out[t+1] = in[t]
+ *                 else out does not change (out[t+1] = out[t])
+ */
+/*
+Feedback loops: If the input of a chip feeds from one of the chip's outputs, either directly, or
+through a (possibly long) path of dependencies, we say that the chip contains a feedback loop.
+For example, consider the following two chip-part statements:
+Not(in=loop1, out=loop1) // Invalid feedback loop
+DFF(in=loop2, out=loop2) // Valid feedback loop
+
+In both examples, an internal pin (loop1 or loop2) attempts to feed the chip’s input from its
+output, creating a feedback loop. The difference between the two examples is that Not is a
+combinational chip, whereas DFF is sequential. In the Not example, loop1 creates an
+instantaneous and uncontrolled dependency between in and out, sometimes called data race.
+In contrast, in the DFF case, the in-out dependency created by loop2 is delayed by the clock,
+since the in input of the DFF is declared clocked. Therefore, out(t) is not a function of in(t),
+but rather of in(t- 1).
+When the simulator evaluates a chip, it checks recursively if its various connections
+entail feedback loops. For each loop, the simulator checks if the loop goes through a clocked
+pin, somewhere along the way. If so, the loop is allowed. Otherwise, the simulator stops
+processing and issues an error message. This is done in order to prevent uncontrolled data
+races.
+————from HDL Guide
+*/
+CHIP Bit {
+    IN in, load;
+    OUT out;
+
+    PARTS:
+    // Put your code here:
+    Mux(a=loop, b=in, sel=load, out=MuxOut);
+    DFF(in=MuxOut, out=out, out=loop);
+}
